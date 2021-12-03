@@ -6,7 +6,7 @@ The original study can be found at SAGE journals.
 A replication study is available at OSF.
 
 
-**Background**
+**Background:**
 The code was developed as part of a student project at the Universidad Pompeu Fabra, Barcelona by Marc Biemer, Alexander Holmes, Julie Ruyter and Vivian Yuen. The student group extended the second experiment of the original study by measuring arousal levels throughout the word rating task, objectively utilizing EDA sensors and subjectively utilizing the Affective Slider.
 
 
