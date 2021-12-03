@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <meta name="theme-color" content="#00000A">
+        <meta name="description" content="Research Study conducted by Master Students of the UPF Barcelona (CSIM)">
+        <meta name="author" content="Marc Biemer, Alexander Holmes, Julie Ruyter, Vivian Yuen">
+
+        <title>Research Form – Comparative Value of Survival Processing and Arousal</title>
+
+        <script src="script.js"></script>
+        <link rel="stylesheet" type="text/css" href="styles.css">
+    </head>
+
+    <body>
+
+        <!-- Admin Panel -->
+        <div class="content-centered" id="adminPanel" style="display: flex;">
+            <h1>Admin Setup Panel</h1>
+            <div class="row">
+                <label for="subjectId">Enter Subject ID:</label> 
+                <input class="singleInput" type="text" id="subjectId" name="subject" placeholder="e.g. 0001" autofocus>
+            </div>
+
+            <fieldset class="admin">
+                <legend>Select assigned Variant:</legend>
+                <div class="inline">
+                    <div class="col">
+                        <input type="radio" id="varA" name="variant" value="A" checked>
+                        <label for="varA">Variant A</label> 
+                    </div>
+                    <div class="col">
+                        <input type="radio" id="varB" name="variant" value="B">
+                        <label for="varB">Variant B</label> 
+                    </div>
+                </div>
+            </fieldset>
+
+            <button onclick="admin()" type="button">Set up the Test</button>
+
+        </div>
+
+        <!-- Start Screen: Initial briefing of User -->
+        <div class="content-centered" id="start" style="display: none;">
+            <h1>Hello and thanks for participating.</h1>
+            <p id="initialBriefing"></p>
+            <button onclick="initiate()" type="button">Start the Task</button>
+        </div>
+
+        <!-- Scenario Screen: Scenario Description before each Block -->
+        <div class="content-centered" id="scenario" style="display: none;">
+            <h1>Briefing</h1>
+            <p id="description"></p>
+            <!-- JS and OpenSignals are listening to Key P to proceed/set first marker -->
+            <p class="command">&#8811; Please press 'P' to proceed &#8810;</p>
+        </div>
+
+
+        <!-- Rating Screen: Controls to Rate each Word -->
+        <div class="content-centered" id="wordRating" style="display: none;">
+            <h1 class="word" id="word"></h1>
+            <form class="AffectiveSlider" id="controls">
+                <!-- Radios for 5 Point Relevance Scale -->
+                <fieldset>
+                    <legend>Relevance for Scenario:</legend>
+                    <div class="inline">
+                        <div class="col">
+                            <input type="radio" id="r1" name="relevance" value="1">
+                            <label for="r1">1<br>Totally Irrelevant</label> 
+                        </div>
+                        <div class="col">
+                            <input type="radio" id="r2" name="relevance" value="2">
+                            <label for="r2">2</label>
+                        </div>
+                        <div class="col">
+                            <input type="radio" id="r3" name="relevance" value="3">
+                            <label for="r3">3<br>Possibly Relevant</label> 
+                        </div>
+                        <div class="col">
+                            <input type="radio" id="r4" name="relevance" value="4">
+                            <label for="r4">4</label> 
+                        </div>
+                        <div class="col">
+                            <input type="radio" id="r5" name="relevance" value="5">
+                            <label for="r5">5<br>Extremely Relevant</label> 
+                        </div>
+                    </div>
+                </fieldset>
+                <!-- Affective Slider provided by Alberto Betella https://github.com/albertobeta/AffectiveSlider -->
+                <div id='AffectiveSlider'>
+                    <!--
+                    Level of arousal
+                    <div class="arousal">
+                    <object class='arousal_svg' type="image/svg+xml" data="images/AS_sleepy.svg"></object>
+                    <input type="range" name="AS-arousal" id="AS-arousal" value=".5" min="0" max="1" step=".01" />
+                    <object class='arousal_svg' type="image/svg+xml" data="images/AS_wideawake.svg"></object>
+                    <object class='intensity_cue_svg' type="image/svg+xml" data="images/AS_intensity_cue.svg"></object>
+                    </div>
+                    
+                    Level of pleasure
+                    <div class="pleasure">
+                    <object class='arousal_svg' type="image/svg+xml" data="images/AS_unhappy.svg"></object>k
+                    <input type="range" name="AS-pleasure" id="AS-pleasure" value=".5" min="0" max="1" step=".01" />
+                    <object class='arousal_svg' type="image/svg+xml" data="images/AS_happy.svg"></object>
+                    <object class='intensity_cue_svg' type="image/svg+xml" data="images/AS_intensity_cue.svg"></object>
+                    </div>
+                    -->
+                </div>
+                <!-- JS and OpenSignals are listening to Key Q to proceed/set second marker -->
+                <p class="command">&#8811; Please press 'Q' to submit &#8810;</p>
+            </form>
+        </div>
+
+        <!-- Timeout: Countdown of X Seconds to normalize EDA Signal -->
+        <div id="countdown" class="content-centered" style="display: none;">
+            <h1 id="seconds">&nbsp;</h1>
+            <p>Seconds remaining...</p>
+            <p id="hint" class="command" style="display: none;">&#8811; Please press 'P' to proceed &#8810;</p>
+        </div>
+
+        <!-- End of First Task -->
+        <div class="content-centered" id="endRating" style="display: none;">
+            <h1>Task 2</h1>
+            <p id="distractionTaskDescription"></p>
+            <button onclick="startDistraction()" type="button">Continue with Second Task</button>
+        </div>
+
+        <!-- Distraction Task-->
+        <div class="content-centered" id="distraction" style="display: none;">
+            <h1 class="word" id="digit">&nbsp;</h1>
+            <div class="row" id="distractionForm">
+                <label for="distractionInput">Enter the 7-digit Number:</label> 
+                <input class="singleInput" type="number" id="distractionInput" name="distraction" placeholder="e.g. 1234567" maxlength="7" required>
+                <button onclick="nextDistraction()" type="button" style="display: block; margin: auto;">Submit Number</button>
+            </div>
+        </div>
+
+        <!-- Recall Introduction -->
+        <div class="content-centered" id="recallTask" style="display: none;">
+            <h1>Task 3: Recall</h1>
+            <div id="recallInstructions" style="display: none;">
+                <p id="recallTaskDescription"></p>
+                <button class="m-a" onclick="startRecall()" type="button">Continue with Third Task</button>
+            </div>
+            <div id="recallForm" style="display: none; flex-direction: column;">
+                <label class="m-a" for="w1">Enter a word:</label> 
+                <input id="recall0" class="singleInput m-sm" type="text" name="recall" placeholder="word">
+            </div>
+            <div id="recallControls" style="display: none;">
+                <a class="mb-lg" href="#" onclick="addInput()">+ add another word</a>
+                <button onclick="finishRecall()" type="button">Finish the Task</button>
+            </div>
+        </div>
+
+        <!-- Success Screen -->
+        <div class="content-centered" id="success" style="display: none;">
+            <h1>Thank You!</h1>
+            <p>That's it now. Please don't close the window. Reach out for your instructor.</p>
+            <div class="download">
+                <a href='#' onclick='downloadRatings()'>Download Ratings as CSV</a>
+                <a href='#' onclick='downloadRecall()'>Download Recall as CSV</a>
+            </div>
+        </div>
+
+        <!-- JS for initial randomization of Affective Slider order -->
+        <script>
+            window.onload=function(){
+                var aff_slider = document.getElementById('AffectiveSlider');
+                var arousal_part = 'Level of arousal \n<div class="arousal"> \n<object class="arousal_svg" type="image/svg+xml" data="images/AS_sleepy.svg"></object> \n<input type="range" name="AS-arousal" id="AS-arousal" value=".5" min="0" max="1" step=".01" /> \n<object class="arousal_svg" type="image/svg+xml" data="images/AS_wideawake.svg"></object> \n<object class="intensity_cue_svg" type="image/svg+xml" data="images/AS_intensity_cue.svg"></object></div>';
+                var pleasure_part = 'Level of pleasure \n<div class="pleasure"> \n<object class="arousal_svg" type="image/svg+xml" data="images/AS_unhappy.svg"></object> \n<input type="range" name="AS-pleasure" id="AS-pleasure" value=".5" min="0" max="1" step=".01" /> \n<object class="arousal_svg" type="image/svg+xml" data="images/AS_happy.svg"></object> \n<object class="intensity_cue_svg" type="image/svg+xml" data="images/AS_intensity_cue.svg"></object> \n</div>';
+                if (Math.random() > 0.5) {
+                    aff_slider.innerHTML = arousal_part+pleasure_part;
+                }
+                else {
+                    aff_slider.innerHTML = pleasure_part+arousal_part;
+                }
+            }
+        </script>
+
+    </body>
+</html>
